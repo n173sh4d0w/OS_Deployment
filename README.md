@@ -2,7 +2,7 @@
 
 ISO(Minimalist): arch/debian/gentoo
 WM: Qtile 
-GTK&Icons:
+GTKThemes/Icons/Fonts:
 Bar: Conky
 Pkgmr: yay, nala
 Terminal&Shell: urxvt&Termus(Unix shell in X environment-customizable through the .Xresource in $HOME); bash
