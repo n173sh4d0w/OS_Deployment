@@ -41,17 +41,18 @@ PKGS=(
    
          
          'cups'                  # Open source printer drivers
-    'cups-pdf'              # PDF support for cups
-    'ghostscript'           # PostScript interpreter
-    'gsfonts'               # Adobe Postscript replacement fonts
-    'hplip'                 # HP Drivers
-    'system-config-printer' # Printer setup  utility
+         'cups-pdf'              # PDF support for cups
+         'ghostscript'           # PostScript interpreter
+         'gsfonts'               # Adobe Postscript replacement fonts
+         'hplip'                 # HP Drivers
+         'system-config-printer' # Printer setup utility
     
     
     # SYSTEM --------------------------------------------------------------
 
     'linux-lts'             # LTS kernel, uname -r 
     'linux-lts-headers'
+    'lxappearance'          #GTK theme switcher
 
     # TERMINAL UTILITIES --------------------------------------------------
 
@@ -61,7 +62,7 @@ PKGS=(
    # 'elinks'                # Terminal based web browser
     'feh'                   # Terminal-based image viewer/manipulator
     #''         # Archive utility
-    #'gnome-keyring'         # passwordmgr
+    'keepass2'              # passwordmgr
     'ufw'                   # Firewall manager
     'hardinfo'              # Hardware info app
     'htop'                  # Process viewer
@@ -71,18 +72,20 @@ PKGS=(
     'neofetch'              # Shows system info when you launch terminal
     'ntp'                   # Network Time Protocol to set time via network.
     'numlockx'              # Turns on numlock in X11
-    'screenkey'             #
+    'screenkey'             # screen cast kypress
     'openssh'               # SSH connectivity tools
     'rsync'                 # Remote file sync utility
     'speedtest-cli'         # Internet speed via terminal
     'terminus-font'         # Font package with some bigger fonts for login terminal
     'tlp'                   # Advanced laptop power management
-    'unrar'                 # RAR compression program
+    'unrar-free'            # RAR compression program
     'unzip'                 # Zip compression program
     'p7zip-plugins'
-    'xfce4-terminal'        # Terminal emulator
+    'p7zip'
+    'p7zip-full'
+    'tar'
+    'alacritty'             # Terminal emulator
     'zenity'                # Display graphical dialog boxes via shell scripts
-
 
     # DISK UTILITIES ------------------------------------------------------
 
@@ -102,22 +105,22 @@ PKGS=(
     # DEVELOPMENT ---------------------------------------------------------
 
     'vim'                   # Text editor
-   # 'apache'                # Apache web server
     'cmake'                 # Cross-platform open-source make system
     'git'                   # Version control system
     'gcc'                   # C/C++ compiler
     'glibc'                 # C libraries
-   # 'nodejs'                # Javascript runtime environment
-   # 'npm'                   # Node package manager
     'php'                   # Web application scripting language
+    'python'                # Scripting language
    #'php-apache'            # Apache PHP driver
    #'postfix'               # SMTP mail server
-    'python'                # Scripting language
+   # 'apache'                # Apache web server
+    #'nodejs'                # Javascript runtime environment
+    #'npm'                   # Node package manager
     #'yarn'                  # Dependency management (Hyper needs this)
 
     # WEB TOOLS -----------------------------------------------------------
 
-#Confirm    'brave-nightly-bin'     # Web browser
+    #Confirm    'brave-nightly-bin'     # Web browser
     #'filezilla'             # FTP Client
 
     # COMMUNICATIONS ------------------------------------------------------
@@ -138,10 +141,9 @@ PKGS=(
     'hunspell'              # Spellcheck libraries
     'hunspell-en'           # English spellcheck library
     'libreoffice-fresh'     # Libre office with extra features
-    #pdfreader(shuffler/sam)  # PDF viewer
+    'evince'                # PDF viewer (shuffler/sam)
      #'typora'              #MD Notetaking
     # VIRTUALIZATION ------------------------------------------------------
-    
     
     
     
