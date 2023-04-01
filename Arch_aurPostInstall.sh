@@ -21,18 +21,16 @@ PKGS=(
 
     # UTILITIES -----------------------------------------------------------
     
-    'enpass-bin'                # Password manager
+    'keepass2'                # Password manager
     'slimlock'                  # Screen locker
     'oomox'                     # Theme editor
 
     # DEVELOPMENT ---------------------------------------------------------
     
-    'visual-studio-code-bin'    # Kickass text editor
+    ' '    # Kickass text editor
 
     # MEDIA ---------------------------------------------------------------
 
-    'screenkey'                 # Screencast your keypresses
-    # 'aftershotpro3'             # Photo editor
 
     # POST PRODUCTION -----------------------------------------------------
 
