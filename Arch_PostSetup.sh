@@ -20,6 +20,24 @@ if [ -d /etc/X11/xinit/xinitrc.d ] ; then
     unset f
 fi
 
+# Disable bell
+xset -b
+# Disable all Power Saving Stuff
+xset -dpms
+xset s off
+# X Root window color
+xsetroot -solid darkgrey
+# Merge resources (optional)
+#xrdb -merge $HOME/.Xresources
+# Caps to Ctrl, no caps
+setxkbmap -layout us -option ctrl:nocaps
+if [ -d /etc/X11/xinit/xinitrc.d ] ; then
+    for f in /etc/X11/xinit/xinitrc.d/?*.sh ; do
+        [ -x "\$f" ] && . "\$f"
+    done
+    unset f
+fi
+
 source /etc/xdg/xfce4/xinitrc
 exit 0
 EOF
@@ -112,6 +130,27 @@ echo "Enabling the cups service daemon so we can print"
 systemctl enable org.cups.cupsd.service
 systemctl start org.cups.cupsd.service
 
+
+# ------------------------------------------------------------------------
+
+echo
+echo "Enabling Login Display Manager"
+
+sudo systemctl enable lightdm.service
+sudo systemctl start lightdm.service
+
+# ------------------------------------------------------------------------
+
+echo
+echo "Enabling Cronie"
+
+touch /etc/crontab
+
+sudo systemctl start cronie
+sudo systemctl start cronie.service
+sudo systemctl enable cronie
+sudo systemctl enable cronie.service
+
 # ------------------------------------------------------------------------
 
 echo
@@ -145,7 +184,8 @@ sudo systemctl enable NetworkManager.service
 sudo systemctl start NetworkManager.service
 sudo ip link set dev ${LINK} up
 
-
+sudo systemctl disable ssh.service
+sudo systemctl stop ssh.service
 
 echo "-------------------------------------------------"
 echo "Secure Linux                                     "
@@ -184,8 +224,29 @@ echo "listening ports"
 sudo netstat -tunlp
 
 
+###############################################################################
+# Cleaning
+###############################################################################
+"
+# Remove no password sudo rights
+sed -i 's/^%wheel ALL=(ALL) NOPASSWD: ALL/# %wheel ALL=(ALL) NOPASSWD: ALL/' /etc/sudoers
+# Add sudo rights
+sed -i 's/^# %wheel ALL=(ALL) ALL/%wheel ALL=(ALL) ALL/' /etc/sudoers
 
-echo "Done!"
+# Clean orphans pkg
+if [[ ! -n $(pacman -Qdt) ]]; then
+	echo "No orphans to remove."
+else
+	pacman -Rns $(pacman -Qdtq)
+fi
+
+# Replace in the same state
+cd $pwd
+echo "
+###############################################################################
+# Done
+###############################################################################
+"
 echo 
 echo "Reboot now..."
 echo
