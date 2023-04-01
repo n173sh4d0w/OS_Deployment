@@ -60,3 +60,14 @@ sudo apt-get install -y flameshot typora pdfsam evince
 #sudo apt-get install -y mpv                                 # VIDEO AND AUDIO PLAYER
 # sudo apt-get install -y texlive-full texmaker             # LATEX (optional, heavy package)
 # sudo apt-get install -y imagemagick                       # IMAGE MANIPULATION PROGRAM (optional)
+
+# 4. Nala PKGMGR(apt, slower)
+echo "deb http://deb.volian.org/volian/ scar main" | sudo tee /etc/apt/sources.list.d/volian-archive-scar-unstable.list; wget -qO - https://deb.volian.org/volian/scar.key | sudo tee /etc/apt/trusted.gpg.d/volian-archive-scar-unstable.gpg
+sudo apt update && sudo apt install nala && sudo nala fetch #Select 3 mirrors
+
+# 5. GRUB,Disable GRUB menu delay-5s, to spead up boot process(holding ESC during boot to call GRUB menu)
+echo "set GRUB_TIMEOUT_STYLE=hidden" >> ~/etc/default/grub
+sudo grub-mkconfig -o /boot/grub/grub.cfg 
+
+
+
