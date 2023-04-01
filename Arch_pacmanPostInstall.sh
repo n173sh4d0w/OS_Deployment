@@ -64,6 +64,7 @@ PKGS=(
     #''         # Archive utility
     'keepass2'              # passwordmgr
     'ufw'                   # Firewall manager
+    'fail2ban'              #Fail2ban
     'hardinfo'              # Hardware info app
     'htop'                  # Process viewer
     'inxi'                  # System information utility
