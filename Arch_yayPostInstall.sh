@@ -1,13 +1,13 @@
 #!/usr/bin/env bash
 
 echo
-echo "INSTALLING AUR SOFTWARE"
+echo "INSTALLING YAY PKGMGR"
 echo
 
-cd "${HOME}"
+cd "${HOME}" && mkdir "GitRepos" && cd "GitRepos"
 
-echo "CLOING: AURIC"
-git clone "https://github.com/rickellis/AURIC.git"
+echo "CLOING: YAY"
+git clone "https://aur.archlinux.org/yay.git"
 
 
 PKGS=(
@@ -51,11 +51,11 @@ PKGS=(
 )
 
 
-cd ${HOME}/AURIC
-chmod +x auric.sh
+cd ${HOME/GitRepos}/yay
+makepkg -si && yay -Syy
 
 for PKG in "${PKGS[@]}"; do
-    ./auric.sh -i $PKG
+    sudo yay -S $PKG
 done
 
 echo
