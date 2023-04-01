@@ -1,8 +1,8 @@
-#!/bin/bash
-#-----------------------
-#--Required Packages-
-#-ufw
-#-fail2ban
+echo "-------------------------------------------------"
+echo "Secure Linux                                     "
+echo "-------------------------------------------------"
+
+#--Required Packages: ufw, fail2ban
 
 # --- Setup UFW rules
 sudo ufw limit 22/tcp  
