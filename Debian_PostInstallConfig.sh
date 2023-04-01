@@ -37,9 +37,6 @@ sudo apt-get install -y openssh openssl                     # openssh server
 sudo apt-get install -y bluez blueman                       # Bluetooth
 sudo apt-get install -y alsa-utils pulseaudio               #soundcard
 sudo apt-get install -y a52dec faac faad2 flac jasper lame libdca libdv libmad libmpeg2 libtheora libvorbis libxv wavpack x264 xvidcore gstreamer0.10-plugins #audio codecs
-sudo apt-get install -y
-sudo apt-get install -y
-sudo apt-get install -y
 # sudo apt-get install -y default-jdk                       # JAVA DEVELOPMENT KIT (optional)
 # sudo apt-get install -y tesseract-ocr tesseract-ocr-eng   # OCR (optional)
 
