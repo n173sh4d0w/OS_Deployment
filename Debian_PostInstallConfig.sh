@@ -18,7 +18,7 @@ sudo apt-get -y autoremove
 
 # 2. CLI SOFTWARE
 
-sudo apt-get install -y xdg-user-dirs xorg  qtile lightdm neofetch  # X server(for GUI)/filemgr/WM&displaymgr/archivemgrs
+sudo apt-get install -y xdg-user-dirs xorg  qtile lightdm neofetch # X server(for GUI)/filemgr/WM&displaymgr/archivemgrs
 sudo apt-get install -y build-essential cmake dkms linux-headers-$(uname -r)   # DEVELOPMENT TOOLS
 sudo apt-get install -y p7zip p7zip-full unrar-free unzip tar   # FILE ARCHIVERS
 sudo apt-get install -y htop wget curl ufw fzf rsync        # UTILITIES
@@ -36,6 +36,8 @@ sudo apt-get install -y openssh openssl                     # openssh server
 sudo apt-get install -y bluez blueman                       # Bluetooth
 sudo apt-get install -y alsa-utils pulseaudio               #soundcard
 sudo apt-get install -y a52dec faac faad2 flac jasper lame libdca libdv libmad libmpeg2 libtheora libvorbis libxv wavpack x264 xvidcore gstreamer0.10-plugins #audio codecs
+sudo apt-get install -y rxvt-unicode
+sudo apt-get install -y  net-tools network-manage
 # sudo apt-get install -y default-jdk                       # JAVA DEVELOPMENT KIT (optional)
 # sudo apt-get install -y tesseract-ocr tesseract-ocr-eng   # OCR (optional)
 #sudo apt-get install -y pdf                                # PDF MANIPULATION
@@ -69,5 +71,68 @@ sudo apt update && sudo apt install nala && sudo nala fetch #Select 3 mirrors
 echo "set GRUB_TIMEOUT_STYLE=hidden" >> ~/etc/default/grub
 sudo grub-mkconfig -o /boot/grub/grub.cfg 
 
+# stretch-to-buster
+sudo sed -i 's/stretch/buster/gI' /etc/apt/sources.list
+
+# run-as-root-grant-standard-user-sudo
+apt install sudo -yy
+
+user=$(getent passwd 1000 |  awk -F: '{ print $1}') #  Find the standard user created during installation&make it a variable
+
+echo "$user  ALL=(ALL:ALL)  ALL" >> /etc/sudoers   # Echo the user into the sudoers file
+
+
+#run-as-root-non-free-repos
+sudo sed -e '/Binary/s/^/#/g' -i /etc/apt/sources.list
+sudo sed -i 's/main/main contrib non-free/gI' /etc/apt/sources.list
+
+
+
+#######Themes&Icons
+sudo apt install -yy numix-gtk-theme blackbird-gtk-theme gtk2-engines-murrine gtk2-engines-pixbuf
+
+# Install Papirus Icons
+
+git clone https://github.com/PapirusDevelopmentTeam/papirus-icon-theme
+
+cd papirus-icon-theme/
+
+./install.sh
+
+cd ..
+
+sudo rm -r papirus*
+
+git clone https://github.com/vinceliuice/vimix-gtk-themes
+
+cd vimix-gtk-themes
+
+./Install
+
+cd ..
+
+sudo rm -r vimix*
+
+#########Fonts
+
+sudo apt install ttf-mscorefonts-installer #microsoft fonts
+
+# make an ubuntu font folder
+sudo mkdir /usr/share/fonts
+
+#DL fonts family&&change dirs into unzipped folder
+wget https://github.com/ryanoasis/nerd-fonts/releases/download/v2.1.0/Ubuntu.zip  
+wget https://github.com/ryanoasis/nerd-fonts/releases/download/v2.1.0/Inconsolata.zip  
+
+unzip *.zip && sudo mv *.ttf /usr/share/fonts
+
+#$HOME to remove all 
+cd .. && rm *.zip  
+
+fc-cache -f -v
+
+
+
+sudo apt update
 
 
