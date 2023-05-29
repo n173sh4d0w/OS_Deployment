@@ -3,7 +3,7 @@ set -xe #1st line to check error via shellcheck
 #!/usr/bin/env bash
 
 echo
-echo "INSTALLING XORG"
+echo "INSTALLING APPs"
 echo
 
 PKGS=(
@@ -160,13 +160,61 @@ echo
 echo "Done!"
 echo
 
+
 echo
-echo 'Cleaning up unwanted packages'
+echo "INSTALLING YAY_pkgmgr"
+echo
+
+cd "${HOME}" && mkdir "GitRepos" && cd "GitRepos"
+
+echo "CLOING: YAY"
+git clone "https://aur.archlinux.org/yay.git"
+
+PKGS_YAY=(
+
+    # SYSTEM UTILITIES ----------------------------------------------------
+    'gtkhash'                   # Checksum verifier
+    # TERMINAL UTILITIES --------------------------------------------------
+    # UTILITIES -----------------------------------------------------------  
+    'keepass2'                # Password manager
+    'slimlock'                  # Screen locker
+    'oomox'                     # Theme editor
+    # DEVELOPMENT ---------------------------------------------------------  
+      # Kickass text editor
+    # MEDIA ---------------------------------------------------------------
+    # POST PRODUCTION -----------------------------------------------------
+    'peek'                      # GIF animation screen recorder
+    # COMMUNICATIONS ------------------------------------------------------
+    # THEMES --------------------------------------------------------------
+    'gtk-theme-arc-git'
+    'adapta-gtk-theme-git'
+    'paper-icon-theme'
+    'tango-icon-theme'
+    'tango-icon-theme-extras'
+    'numix-icon-theme-git'
+    'sardi-icons'
+)
+
+
+cd ${HOME/GitRepos}/yay
+makepkg -si && yay -Syy
+
+for PKG in "${PKGS_YAY[@]}"; do
+    sudo yay -S $PKG
+done
+
+echo
+echo "Done!"
+echo  
+
+
+echo
+echo "Cleaning up unwanted packages"
 yay -Qtdq | yay -Rns --noconfirm - 2>/dev/null
 echo
 
 echo
-echo 'REBOOT TO USE THE NEW CONFIG'
+echo "REBOOT TO USE THE NEW CONFIG"
 echo
 printf "Would you like to reboot? (y/N)"
 read -r reboot
