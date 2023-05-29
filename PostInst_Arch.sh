@@ -1,4 +1,5 @@
 ###Xorg/Qtile/Network-BlueTooth-Audio-printersComponents/
+set -xe #1st line to check error via shellcheck
 #!/usr/bin/env bash
 
 echo
@@ -158,3 +159,16 @@ done
 echo
 echo "Done!"
 echo
+
+echo
+echo 'Cleaning up unwanted packages'
+yay -Qtdq | yay -Rns --noconfirm - 2>/dev/null
+echo
+
+echo
+echo 'REBOOT TO USE THE NEW CONFIG'
+echo
+printf "Would you like to reboot? (y/N)"
+read -r reboot
+[ "$(tr '[:upper:]' '[:lower:]' <<< "$reboot")" = "y" ] && reboot 
+  
