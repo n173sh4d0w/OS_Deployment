@@ -17,33 +17,26 @@ set autowrite   " Automatically save before commands like :next and :make
 set scrolloff=8 
 set showmatch    " Show matching brackets.
 set hidden       " Hide buffers when they are abandoned
-set matchpairs+=<:>  " Highlight matching pairs of brackets. '%' character to jump btw
-set cursorline              " highlight current cursor horizontally&vertifcally
+set matchpairs+=<:>  " Highlight matching pairs of brackets. '%' character to jump within
+set cursorline              " highlight current cursor 
 set cursorcolumn
-highlight CursorLine ctermbg=Yellow cterm=bold guibg=#2b2b2b
 set confirm    " Display a confirmation dialog when closing an unsaved file
 set ruler    " Always show current position
 set cmdheight=1    " Height of the command bar
-"Search
+
 set incsearch   
 set ignorecase  
 set smartcase   
 set hlsearch
-" Security
-set modelines=0
-set nomodeline
-" Disable scrollbars
+
 set guioptions-=r
 set guioptions-=R
 set guioptions-=l
 set guioptions-=L
-"set shell      "shell used to execute cmds
-"set re=0       "sets regex
-" turn off swap files
 set noswapfile
 set nobackup
 set nofoldenable
-" Identation
+
 set autoindent
 set smartindent
 set smarttab
@@ -55,34 +48,13 @@ set expandtab
 filetype plugin on
 filetype indent on
 
-set background=dark
-set termguicolors
-
-set wildmenu
-set wildmode=longest,list,full
-set laststatus=2
-if !has('gui_running')
-      set t_Co=256
-endif
-autocmd FileType * setlocal formatoptions-=c formatoptions-=r formatoptions-=o
-set spell spelllang=en_us
-let mapleader=" " "Maps Leader to space
 "" FUNCTIONS
-":w!! When open a file without write perms, call&auto sudo the file
-ca w!! w !sudo tee >/dev/null "%"
-
-" Turn persistent undo on>>undo even when close a buffer/VIM
-try
-    set undodir=~/.vim_runtime/temp_dirs/undodir
-    set undofile
-catch
-endtry
 
 "" MAPPING
-let mapleader = "\<space>"
+let mapleader = " " "Maps Leader to space
 
-""" AUTO-FOLDING
-"za to toggle  http://vimcasts.org/episodes/writing-a-custom-fold-expression/
+""" FOLD
+" za to toggle  http://vimcasts.org/episodes/writing-a-custom-fold-expression/
 " defines a foldlevel for each line of code
 function! VimFolds(lnum)
   let s:thisline = getline(a:lnum)
@@ -197,8 +169,6 @@ let g:better_escape_interval = 250
 " lang-servers/completion/syntax
 "
 "
-let g:polyglot_disabled = ['sensible']
-let g:polyglot_disabled = ['autoindent']
 
 " :CocInstall extentionname1 extentionname2 ...;  :CocConfig;  
 
