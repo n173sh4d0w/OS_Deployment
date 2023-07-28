@@ -1,3 +1,11 @@
+
+### Profile
+####Components:
+WM: Qtile
+ISO: Arch/Debian/Gentoo
+
+
+
 # Minimalist_OSBuild
 arch-based, debian-based, gentoo-based WM(Qtile, Xmonad)
 
