@@ -1,23 +1,39 @@
 #!/bin/bash
+iatest=$(expr index "$-" i)
 #Version: 01_2023
 #A.Gnl CONFIG
 #B.EnvVariables(Global)
 #C.Alias
 #D.Funcs
 
-iatest=$(expr index "$-" i)
 #A.Gnl Configs
 #If not running interactively, do nothing
 [[ $- != *i* ]] && return
+#Source Global dfn
+[[ -f /etc/bashrc ]] && . /etc/bashrc
+
+# Enable bash programmable completion features in interactive shells
+if [ -f /usr/share/bash-completion/bash_completion ]; then
+	. /usr/share/bash-completion/bash_completion
+elif [ -f /etc/bash_completion ]; then
+	. /etc/bash_completion
+fi
+
+
 #PROMPT
-PS1='[\A\d][\u:\w]\$ \e[m'
+PS1='[\A\d][\u@\h:\w]-> '
 #Disable Bells
 if [[ $iatest -gt 0 ]]; then bind "set bell-style visible"; fi
+#Ignore case on auto-completion
 if [[ $iatest -gt 0 ]]; then bind "set completion-ignore-case on"; fi
 ### Show auto-completion list automatically, without double tab
 if [[ $iatest -gt 0 ]]; then bind "set show-all-if-ambiguous On"; fi
-HISTTIMEFORMAT="%F %T "
 #set -o vi #set CLI vi-mode
+
+# Check the window size after each command and, if necessary, update the values of LINES and COLUMNS
+shopt -s checkwinsize
+
+#umask 0002 #set umask to make Dir sharing easier
 
 #B.EnvVars(Gloabl)
 ###FZF_ripgrep, -m multiple selections via TAB
@@ -30,6 +46,7 @@ export HISTCONTROL=erasedups:ignoredups:ignorespace:ignoreboth
 export HISTIGNORE="&:c:p:x:h:r:.:..:...:cd*:lc*:cl*:ls*:ll:la:ld:l.:lab:dt:ds:dn:db:df:ps:exit:clear:history*:*--help:man *"
 export HISTFILESIZE=10000
 export HISTSIZE=500
+export HISTTIMEFORMAT="%y/%m/%d %T " 
 ### $PATH
 export PATH="${PATH}:${HOME}/.scripts"
 export PATH="${HOME}/.local/bin:${PATH}"
@@ -122,11 +139,15 @@ alias treed='tree -CAFd'
 alias mountedinfo='df -hT'
 # Listmost used cmds
 alias freq='cut -f1 -d" " ~/.bash_history | sort | uniq -c | sort -nr | head -n 30'
-# mkdir with flags: -p = make parents as needed, -v = verbose
-alias mkdir='mkdir -p -v'
+
+#time-saver(though no error checking/perms)
+function mcd() {
+    \mkdir -p "\$1"
+    \cd "\$1"
+}
 
 # Search running processes
-alias p="ps aux | grep "
+alias p="ps auwx | grep "
 # fkill - kill processes - list only the ones you can kill. Modified the earlier script.
 fkill() {
     local pid
@@ -213,6 +234,12 @@ alias logs="sudo find /var/log -type f -exec file {} ; | grep 'text' | cut -d' '
 alias alert='notify-send --urgency=low -i "$([ $? = 0 ] && echo terminal || echo error)" "$(history|tail -n1|sed -e '\''s/^\s*[0-9]\+\s*//;s/[;&|]\s*alert$//'\'')"'
 # Alias's for SSH
 # alias SERVERNAME='ssh YOURWEBSITE.com -l USERNAME -p PORTNUMBERHERE'
+# Alias's to change the directory
+alias web='cd /var/www/html'
+# Alias's to mount ISO files
+# mount -o loop /home/NAMEOFISO.iso /home/ISOMOUNTDIR/
+# umount /home/NAMEOFISO.iso
+# (Both commands done as root only.)
 #Calendar
 alias jan='cal -m 01'
 alias feb='cal -m 02'
@@ -227,6 +254,10 @@ alias oct='cal -m 10'
 alias nov='cal -m 11'
 alias dec='cal -m 12'
 
+# Count all files (recursively) in the current folder
+alias countfiles="for t in files links directories; do echo \`find . -type \${t:0:1} | wc -l\` \$t; done 2> /dev/null"
+
+alias rebootsafe='sudo shutdown -r now'
 
 
 
@@ -238,6 +269,7 @@ function maketar() {
 function makezip() {
     zip -r "${1%%/}.zip" "${1%%/}/";
 }
+##cat content of arch files???
 ##Auto-EXTRACT based on types  Syntax:  ex <file>
 ex () {
         for archive in "$@"; do
@@ -285,6 +317,19 @@ reminder() {
     echo "Reminder set!"
     sleep ${_TIME}m && zenity --info --text "${_MSG}" >/dev/null 2>&1
 }
+# Searches for text in all files in the current folder
+ftext ()
+{
+	# -i case-insensitive
+	# -I ignore binary files
+	# -H causes filename to be printed
+	# -r recursive search
+	# -n causes line number to be printed
+	# optional: -F treat search term as a literal, not a regular expression
+	# optional: -l only print filenames and not the matching lines ex. grep -irl "$1" *
+	grep -iIHrn --color=always "$1" . | less -r
+}
+
 ##Copy file w/progress bar
 cpp()
 {
@@ -373,6 +418,80 @@ install_bashrc ()
                 echo "Unknown distribution"
         fi
 }
+# Show the current distribution
+distribution ()
+{
+	local dtype
+	# Assume unknown
+	dtype="unknown"
+
+	# First test against Fedora / RHEL / CentOS / generic Redhat derivative
+	if [ -r /etc/rc.d/init.d/functions ]; then
+		source /etc/rc.d/init.d/functions
+		[ zz`type -t passed 2>/dev/null` == "zzfunction" ] && dtype="redhat"
+
+	# Then test against SUSE (must be after Redhat,
+	# I've seen rc.status on Ubuntu I think? TODO: Recheck that)
+	elif [ -r /etc/rc.status ]; then
+		source /etc/rc.status
+		[ zz`type -t rc_reset 2>/dev/null` == "zzfunction" ] && dtype="suse"
+
+	# Then test against Debian, Ubuntu and friends
+	elif [ -r /lib/lsb/init-functions ]; then
+		source /lib/lsb/init-functions
+		[ zz`type -t log_begin_msg 2>/dev/null` == "zzfunction" ] && dtype="debian"
+
+	# Then test against Gentoo
+	elif [ -r /etc/init.d/functions.sh ]; then
+		source /etc/init.d/functions.sh
+		[ zz`type -t ebegin 2>/dev/null` == "zzfunction" ] && dtype="gentoo"
+
+	# For Mandriva we currently just test if /etc/mandriva-release exists
+	# and isn't empty (TODO: Find a better way :)
+	elif [ -s /etc/mandriva-release ]; then
+		dtype="mandriva"
+
+	# For Slackware we currently just test if /etc/slackware-version exists
+	elif [ -s /etc/slackware-version ]; then
+		dtype="slackware"
+
+	fi
+	echo $dtype
+}
+
+# Show the current version of the operating system
+ver ()
+{
+	local dtype
+	dtype=$(distribution)
+
+	if [ $dtype == "redhat" ]; then
+		if [ -s /etc/redhat-release ]; then
+			cat /etc/redhat-release && uname -a
+		else
+			cat /etc/issue && uname -a
+		fi
+	elif [ $dtype == "suse" ]; then
+		cat /etc/SuSE-release
+	elif [ $dtype == "debian" ]; then
+		lsb_release -a
+		# sudo cat /etc/issue && sudo cat /etc/issue.net && sudo cat /etc/lsb_release && sudo cat /etc/os-release # Linux Mint option 2
+	elif [ $dtype == "gentoo" ]; then
+		cat /etc/gentoo-release
+	elif [ $dtype == "mandriva" ]; then
+		cat /etc/mandriva-release
+	elif [ $dtype == "slackware" ]; then
+		cat /etc/slackware-version
+	else
+		if [ -s /etc/issue ]; then
+			cat /etc/issue
+		else
+			echo "Error: Unknown distribution"
+			exit 1
+		fi
+	fi
+}
+
 # Show current network info
 netinfo ()
 {
@@ -465,6 +584,90 @@ function weather_report() {
             ;;
 
     esac
+}
+
+# View Apache logs
+apachelog ()
+{
+	if [ -f /etc/httpd/conf/httpd.conf ]; then
+		cd /var/log/httpd && ls -xAh && multitail --no-repeat -c -s 2 /var/log/httpd/*_log
+	else
+		cd /var/log/apache2 && ls -xAh && multitail --no-repeat -c -s 2 /var/log/apache2/*.log
+	fi
+}
+
+# Edit the Apache configuration
+apacheconfig ()
+{
+	if [ -f /etc/httpd/conf/httpd.conf ]; then
+		sedit /etc/httpd/conf/httpd.conf
+	elif [ -f /etc/apache2/apache2.conf ]; then
+		sedit /etc/apache2/apache2.conf
+	else
+		echo "Error: Apache config file could not be found."
+		echo "Searching for possible locations:"
+		sudo updatedb && locate httpd.conf && locate apache2.conf
+	fi
+}
+
+# Edit the PHP configuration file
+phpconfig ()
+{
+	if [ -f /etc/php.ini ]; then
+		sedit /etc/php.ini
+	elif [ -f /etc/php/php.ini ]; then
+		sedit /etc/php/php.ini
+	elif [ -f /etc/php5/php.ini ]; then
+		sedit /etc/php5/php.ini
+	elif [ -f /usr/bin/php5/bin/php.ini ]; then
+		sedit /usr/bin/php5/bin/php.ini
+	elif [ -f /etc/php5/apache2/php.ini ]; then
+		sedit /etc/php5/apache2/php.ini
+	else
+		echo "Error: php.ini file could not be found."
+		echo "Searching for possible locations:"
+		sudo updatedb && locate php.ini
+	fi
+}
+
+# Edit the MySQL configuration file
+mysqlconfig ()
+{
+	if [ -f /etc/my.cnf ]; then
+		sedit /etc/my.cnf
+	elif [ -f /etc/mysql/my.cnf ]; then
+		sedit /etc/mysql/my.cnf
+	elif [ -f /usr/local/etc/my.cnf ]; then
+		sedit /usr/local/etc/my.cnf
+	elif [ -f /usr/bin/mysql/my.cnf ]; then
+		sedit /usr/bin/mysql/my.cnf
+	elif [ -f ~/my.cnf ]; then
+		sedit ~/my.cnf
+	elif [ -f ~/.my.cnf ]; then
+		sedit ~/.my.cnf
+	else
+		echo "Error: my.cnf file could not be found."
+		echo "Searching for possible locations:"
+		sudo updatedb && locate my.cnf
+	fi
+}
+
+# For some reason, rot13 pops up everywhere
+rot13 () {
+	if [ $# -eq 0 ]; then
+		tr '[a-m][n-z][A-M][N-Z]' '[n-z][a-m][N-Z][A-M]'
+	else
+		echo $* | tr '[a-m][n-z][A-M][N-Z]' '[n-z][a-m][N-Z][A-M]'
+	fi
+}
+
+# Trim leading and trailing spaces (for scripts)
+trim()
+{
+	local var=$*
+	var="${var#"${var%%[![:space:]]*}"}"  # remove leading whitespace characters
+	var="${var%"${var##*[![:space:]]}"}"  # remove trailing whitespace characters
+	echo -n "$var"
 }
 
 
