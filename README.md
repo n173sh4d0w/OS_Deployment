@@ -6,32 +6,24 @@ ISO: Arch/Debian/Gentoo
 
 
 
-# Minimalist_OSBuild
-arch-based, debian-based, gentoo-based WM(Qtile, Xmonad)
+# OS_Deployment
+Linux(Arch,Debian)&WinOS Qtile&DWM-based
 
 
 # Minimalist_OSRicing
 
-ISO(Minimalist): arch/debian/gentoo
-WM: Qtile 
-GTKThemes/Icons/Fonts:
+ISO(Minimalist): arch/debian/win
+WM: Qtile/DWM 
 Bar: Conky
 Pkgmr: yay, nala
-Terminal&Shell: urxvt&Termus(Unix shell in X environment-customizable through the .Xresource in $HOME); bash
+Terminal&Shell: st(customize under.Xresource in $HOME); bash
 Launcher: fzf-keybindings
-File&Mgr: ranger/fzf
-
-This README contains the steps I do to install and configure a fully-functional Arch Linux installation containing a desktop environment, all the support packages (network, bluetooth, audio, etc.), along with all my preferred applications and utilities. The shell scripts in this repo allow the entire process to be automated.)
- Arch running qtileWM, w/all the base pkgs that allow network connectivity, bluetooth, printers, etc., and a curated selection of applications.
-
-
+FileMgr: fzf
+Lockscreen: shell-based w/pswd&wallpaper
 Bootloader: systemd(minimalist built-in-Linux kernel w/EFI image-just execute it)
 LTS Kernel w/rolling one & config bootloader to offer both during startup(switch kernels in the event of a problem with the rolling one)
 
-Set up Apache server to run w/WebServer dir located in $HOME
-
 (No greeter)Always boot into the login shell by default(a show-stopping problem w/Xorg>>fix it without booting from an external drive). To launch Qtile, enter startx in the terminal. If run multiple desktops pass a path argument to startx pointing to the initialization file for the desktop you want to run.
-To lock the screen via Slimlock(built a bunch of themes w/shell script that randomizes the choice each time lock the screen)
 
 #####################
 ## Install
