@@ -78,3 +78,26 @@ $ xinit
 On subsequent logins use:
 $ startx
 
+
+# WinOS
+
+## A. backup.ps1 
+
+
+## B. Enhanced(stylish&functional) PowerShell Terminal
+profile.ps1, setup.ps1(to auto-activate profile.ps1)
+
+### One Line Install
+Execute the following command in an elevated PowerShell window to install the PowerShell profile:
+
+irm "https://github.com/n173sh4d0w/PowerShellScripts_WinOS/raw/main/setup.ps1" | iex
+
+### Fix the Missing Font
+After running the script, downloaded cove.zip file in current exec script dir. Steps to install the required nerd fonts:
+
+Extract the cove.zip file.
+Locate&install the nerd fonts.
+
+
+##
+
