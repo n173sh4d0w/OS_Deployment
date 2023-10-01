@@ -1,4 +1,3 @@
-# Function for Pre-Installation Phase
 function PreInstallation {
     Write-Host "Executing Pre-Installation Phase..."
 
@@ -11,22 +10,15 @@ function PreInstallation {
     Invoke-WebRequest -Uri $isoUrl -OutFile $isoPath
 
     # Create a bootable USB drive (replace with the correct drive letter)
-    $usbDrive = Get-WmiObject -Query "SELECT * FROM Win32_DiskDrive WHERE MediaType='Removable Media'"
-    $usbDrive | ForEach-Object {
-        $disk = $_
-        $partition = $disk | Get-Partition
-        $volume = $partition | Get-Volume
-        $driveLetter = $volume.DriveLetter
-        $args = "-inputfile:$isoPath -device:$driveLetter"
-        Start-Process -FilePath "C:\path\to\your\tool\for\creating\bootable\usb\drive.exe" -ArgumentList $args -Wait
+    Get-WmiObject -Query "SELECT * FROM Win32_DiskDrive WHERE MediaType='Removable Media'" | ForEach-Object {
+        $args = "-inputfile:$isoPath -device:$($_.GetPartition().GetVolume().DriveLetter)"
+        Start-Process -Wait -NoNewWindow -FilePath "C:\path\to\your\tool\for\creating\bootable\usb\drive.exe" -ArgumentList $args
     }
 
     # Reboot the computer to start the installation
     Restart-Computer
-
 }
 
-# Function for Post-Installation Phase
 function PostInstallation {
     Write-Host "Executing Post-Installation Phase..."
 
@@ -35,7 +27,7 @@ function PostInstallation {
         Start-Sleep -Seconds 30
     }
 
-    # Install essential software (customize the list)  #bravebrowser, 7zip,gimp,keepass,typora, vim, shotcut, mpv, 
+    # Install essential software (customize the list)
     $softwareToInstall = @("Software1", "Software2", "Software3")
     $softwareToInstall | ForEach-Object {
         choco install $_ -y
@@ -53,7 +45,6 @@ function PostInstallation {
     Restart-Computer
 }
 
-# Function for Post-Configuration Phase
 function PostConfiguration {
     Write-Host "Executing Post-Configuration Phase..."
 
@@ -75,12 +66,151 @@ function PostConfiguration {
     Restart-Computer
 }
 
-# Display menu options
+function Start-WinOSBackup {
+    while ($true) {
+        Clear-Host
+        Write-Host "===== WinOS Backup ====="
+        Write-Host "1. General Backup"
+        Write-Host "2. Backup Drivers"
+        Write-Host "3. Backup Services"
+        Write-Host "4. Exit"
+
+        $choice = Read-Host "Enter your choice (1-4):"
+
+        switch ($choice) {
+            '1' {
+                # General Backup
+                Write-Host "Backing up $env:COMPUTERNAME..."
+                Start-Process -Wait -NoNewWindow -FilePath "wbadmin" -ArgumentList "start backup -backupTarget:`"C:\Backup`" -include:`"C:`" -quiet"
+                Write-Host "Restoring to COMPUTER_NAME..."
+                Start-Process -Wait -NoNewWindow -FilePath "wbadmin" -ArgumentList "start recovery -backupTarget:`"C:\Backup`" -machineName:`"COMPUTER_NAME`" -recoveryTarget:`"C:\Restore`" -quiet"
+                Write-Host "Backup and restore completed successfully."
+                Read-Host "Press Enter to continue..."
+            }
+            '2' {
+                # Backup Drivers
+                $filename = "$env:USERPROFILE\Desktop\Backup_Drivers-Services_Current-State.reg"
+                "Windows Registry Editor Version 5.00" | Set-Content $filename -Encoding ASCII
+                driverquery /FO CSV | ForEach-Object {
+                    $svc = $_.Split(",")[0].Trim('"')
+                    $start = [int]$svc[-1]
+                    if ($start -match "[0-4]$") {
+                        $regKey = "[$('HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\'+$svc)]"
+                        $regValue = "`"Start`"=dword:0000000$start"
+                        $regEntry = "$regKey`n$regValue`n$regDelimiter"
+                        Add-Content $filename $regEntry
+                    }
+                }
+                Write-Host "The current configs for drivers have been backed up."
+                Read-Host "Press Enter to continue..."
+            }
+            '3' {
+                # Backup Services
+                $filename = "$env:USERPROFILE\Desktop\Backup_Windows-Services_Current-State.reg"
+                "Windows Registry Editor Version 5.00" | Set-Content $filename -Encoding ASCII
+                Get-Service | Where-Object { $_.Name -match "[a-z]" -and $_.Name -ne "TermService" } | ForEach-Object {
+                    $svc = $_.Name
+                    $start = [int]$_.StartType
+                    if ($start -match "[0-4]$") {
+                        $regKey = "[$('HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\'+$svc)]"
+                        $regValue = "`"Start`"=dword:0000000$start"
+                        $regEntry = "$regKey`n$regValue`n$regDelimiter"
+                        Add-Content $filename $regEntry
+                    }
+                }
+                Write-Host "The current configs for services have been backed up."
+                Read-Host "Press Enter to continue..."
+            }
+            '4' {
+                return
+            }
+            default {
+                Write-Host "Invalid choice. Please select a valid option (1-4)."
+                Read-Host "Press Enter to continue..."
+            }
+        }
+    }
+}
+
+function Set-PowerShellProfile {
+    function Download-And-Install-Profile {
+        param (
+            [string]$profileUrl
+        )
+
+        $profileDir = if ($PSVersionTable.PSEdition -eq "Core") { "Powershell" } else { "WindowsPowerShell" }
+        $profilePath = Join-Path -Path $env:userprofile -ChildPath "Documents\$profileDir"
+
+        if (!(Test-Path -Path $PROFILE -PathType Leaf)) {
+            try {
+                if (!(Test-Path -Path $profilePath)) {
+                    New-Item -Path $profilePath -ItemType Directory
+                }
+
+                Invoke-RestMethod -Uri $profileUrl -OutFile $PROFILE
+                Write-Host "The profile @ [$PROFILE] has been created."
+            }
+            catch {
+                throw $_.Exception.Message
+            }
+        }
+        else {
+            Get-Item -Path $PROFILE | Move-Item -Destination oldprofile.ps1
+            Invoke-RestMethod -Uri $profileUrl -OutFile $PROFILE
+            Write-Host "The profile @ [$PROFILE] has been created and old profile removed."
+        }
+    }
+
+    function Install-Fonts {
+        param (
+            [string]$fontDownloadUrl
+        )
+
+        if (-not (Get-FontFamily -Name "CaskaydiaCove NF")) {
+            $fontPath = Join-Path -Path $PSScriptRoot -ChildPath "CascadiaCode.zip"
+            $fontExtractPath = Join-Path -Path $PSScriptRoot -ChildPath "CascadiaCode"
+            $fontDestination = [System.Environment]::GetFolderPath([System.Environment+SpecialFolder]::Fonts)
+
+            Invoke-WebRequest -Uri $fontDownloadUrl -OutFile $fontPath
+            Expand-Archive -Path $fontPath -DestinationPath $fontExtractPath -Force
+
+            Get-ChildItem -Path $fontExtractPath -Recurse -Filter "*.ttf" | ForEach-Object {
+                $fontFile = $_
+                if (-not (Test-Path (Join-Path -Path $fontDestination -ChildPath $fontFile.Name))) {
+                    Copy-Item -Path $fontFile.FullName -Destination $fontDestination
+                }
+            }
+
+            Remove-Item -Path $fontExtractPath -Recurse -Force
+            Remove-Item -Path $fontPath -Force
+        }
+    }
+
+    function Install-ProfileAndPackages {
+        $profileUrl = "https://github.com/ChrisTitusTech/powershell-profile/raw/main/Microsoft.PowerShell_profile.ps1"
+        Download-And-Install-Profile -profileUrl $profileUrl
+        & $PROFILE
+        winget install -e --accept-source-agreements --accept-package-agreements JanDeDobbeleer.OhMyPosh
+        $fontDownloadUrl = "https://github.com/ryanoasis/nerd-fonts/releases/download/v3.0.2/CascadiaCode.zip"
+        Install-Fonts -fontDownloadUrl $fontDownloadUrl
+        Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; iex ((New-Object System.Net.WebClient).DownloadString('https://community.chocolatey.org/install.ps1'))
+        Install-Module -Name Terminal-Icons -Repository PSGallery
+    }
+
+    function Initialize-Profile {
+        $profileUrl = "https://github.com/ChrisTitusTech/powershell-profile/raw/main/Microsoft.PowerShell_profile.ps1"
+        Download-And-Install-Profile -profileUrl $profileUrl
+        Install-ProfileAndPackages
+    }
+}
+
 $MenuOptions = @{
     1 = "Pre-Installation"
     2 = "Post-Installation"
     3 = "Post-Configuration"
-    4 = "Quit"
+    4 = "Start-WinOSBackup"
+    5 = "Set-PowerShellProfile"
+    6 = "Quit"
 }
 
 do {
@@ -95,8 +225,10 @@ do {
         1 { PreInstallation }
         2 { PostInstallation }
         3 { PostConfiguration }
-        4 { Write-Host "Exiting script..."; break }
+        4 { Start-WinOSBackup }
+        5 { Set-PowerShellProfile } 
+        6 { Write-Host "Exiting script..."; break }
         default { Write-Host "Invalid choice. Please select a valid option." }
     }
     Pause
-} until ($choice -eq 4)
+} until ($choice -eq 6)
