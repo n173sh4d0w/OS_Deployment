@@ -1,5 +1,5 @@
 
-# ArchInstConfig
+# Arch&DebianInstConfig
 ## Profile
 Components:
 ISO(Minimalist): arch/debian/win
