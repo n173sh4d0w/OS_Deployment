@@ -65,20 +65,27 @@ MIT License
 
 
 
-# WinOS
+# WinOSInstConfig
 
-## A. backup.ps1 
-
-## B. Enhanced(stylish&functional) PowerShell Terminal
-profile.ps1, setup.ps1(to auto-activate profile.ps1)
-
-### One Line Install
-Execute the following command in an elevated PowerShell window to install the PowerShell profile:
-
-irm "https://github.com/n173sh4d0w/PowerShellScripts_WinOS/raw/main/setup.ps1" | iex
-
-### Fix the Missing Font
-After running the script, downloaded cove.zip file in current exec script dir. Steps to install the required nerd fonts:
-
-Extract the cove.zip file.
-Locate&install the nerd fonts.
+## Features
+1.Pre-Installation Phase: Automates disk partitioning, Windows ISO download, and the creation of a bootable USB drive.
+2.Post-Installation Phase: Waits for Windows installation to complete and installs a list of essential software using Chocolatey. It also configures system settings such as time zone and creates user accounts.
+3.Post-Configuration Phase: Configures additional network rules, optimizes services, and performs system cleanup.
+4.WinOSBackup: Offers options to backup and restore system drivers and services using Windows Backup.
+5.Set-PowerShellProfile: Downloads and installs a custom PowerShell profile with additional packages and fonts.
+## Usage
+Clone or download this repository to your local machine.
+Open PowerShell with administrative privileges.
+Navigate to the directory containing the script.
+```
+ .\script.ps1
+```
+Follow the on-screen menu to select and execute the desired phase.
+## Notes
+Always review and customize the script to suit your specific requirements before execution.
+Ensure that you have a reliable internet connection for downloading software and packages.
+Backup important data before running the script, especially during the pre-installation phase.
+## Author
+n173sh4d0w
+## License
+MIT License
