@@ -1,88 +1,73 @@
 
-### Profile
-####Components:
-WM: Qtile
-ISO: Arch/Debian/Gentoo
-
-
-
-# OS_Deployment
-Linux(Arch,Debian)&WinOS Qtile&DWM-based
-
-
-# Minimalist_OSRicing
-
+# ArchInstConfig
+## Profile
+Components:
 ISO(Minimalist): arch/debian/win
 WM: Qtile/DWM 
-Bar: Conky
 Pkgmr: yay, nala
-Terminal&Shell: st(customize under.Xresource in $HOME); bash
-Launcher: fzf-keybindings
+Terminal&Shell: st; bash
+Launcher: demenu
 FileMgr: fzf
 Lockscreen: shell-based w/pswd&wallpaper
 Bootloader: systemd(minimalist built-in-Linux kernel w/EFI image-just execute it)
 LTS Kernel w/rolling one & config bootloader to offer both during startup(switch kernels in the event of a problem with the rolling one)
 
 (No greeter)Always boot into the login shell by default(a show-stopping problem w/Xorg>>fix it without booting from an external drive). To launch Qtile, enter startx in the terminal. If run multiple desktops pass a path argument to startx pointing to the initialization file for the desktop you want to run.
+## Usage
+### Prerequisites
+bootable Arch Linux USB drive.
+connected to the internet.
 
-#####################
-## Install
-########################
-
-Arch Live ISO (Pre-Install)
-This step installs arch to your hard drive. IT WILL FORMAT THE DISK
-
-### Install Reflector(fastest mirrors)&Gen mirrorlist. Note: If not in the U.S. change to nearest
-$ sudo pacman -Sy && sudo pacman -S reflector rsync curl 
-$ reflector --verbose --country 'United States' -l 5 --sort rate --save /etc/pacman.d/mirrorlist
-
-### Initialize .gitconfig file
+Boot your system using the Arch Linux USB drive.
+Clone this repository or download the script.
+```
+curl https://raw.githubusercontent.com/johnynfulleffect/ArchMatic/master/preinstall.sh -o preinstall.sh
+chmod +x arch_install_script.sh
+./arch_install_script.sh
+```
+### Pre-installation:
+Sets up mirrors for optimal download (US Only).
+Formats and partitions the target disk.
+Installs prerequisites.
+Performs file system setup.
+Installs the Arch Linux base system.
+### Post-installation:
+Installs a set of predefined packages.
+Installs the Yay AUR package manager.
+Installs additional packages using Yay.
+Cleans up unwanted packages.
+Optionally reboots the system.
+### Post-configuration:
+Generates the .xinitrc file for X11 setup.
+Configures the LTS Kernel as a secondary boot option.
+Optimizes system settings.
+Configures network settings.
+Sets up UFW (Uncomplicated Firewall).
+Enhances system security.
+Cleans up orphaned packages.
+## Initialize .gitconfig file
 $ git config --global user.name "your-username"
 $ git config --global user.email "your-email@gmail.com"
 $ git config --global credential.helper cache
 $ git config --global credential.helper 'cache --timeout=31536000'
 
-
-
-
-curl https://raw.githubusercontent.com/johnynfulleffect/ArchMatic/master/preinstall.sh -o preinstall.sh
-sh preinstall.sh
-
 useradd -m -G users,wheel username
 echo "username:password" | chpasswd
-passwd
-systemctl enable NetworkManager
-exit
-
-umount -R /mnt
-reboot
-
-
-
-### Arch Linux First Boot
-$ pacman -S --noconfirm pacman-contrib curl git
-$ cd Programs/ && git clone https://github.com/rickellis/ArchMatic.git #clone into the folder&delete it once done
-
-### Run following scripts
-$ cd ArchMatic
-$ sh  ./4-bluetooth.sh 
-$ sh ./5-audio.sh 
-$ sh  ./6-printers.sh 
-
-### Reboot
-$ reboot
-
-### Initialize Xorg
+## Initialize Xorg
 At the terminal, run:
 $ xinit
 On subsequent logins use:
 $ startx
+## Warning
+This script is designed for personal use and may not cover all use cases. It's highly recommended to review and customize the script to match your specific requirements before use.
+## License
+MIT License
+
 
 
 # WinOS
 
 ## A. backup.ps1 
-
 
 ## B. Enhanced(stylish&functional) PowerShell Terminal
 profile.ps1, setup.ps1(to auto-activate profile.ps1)
@@ -97,7 +82,3 @@ After running the script, downloaded cove.zip file in current exec script dir. S
 
 Extract the cove.zip file.
 Locate&install the nerd fonts.
-
-
-##
-
